@@ -103,6 +103,20 @@
 ## The default URL to redirect to from `/`
 #c.NotebookApp.default_url = '/tree'
 
+## Disable cross-site-request-forgery protection
+#  
+#  Jupyter notebook 4.3.1 introduces protection from cross-site request
+#  forgeries, requiring API requests to either:
+#  
+#  - originate from pages served by this server (validated with XSRF cookie and
+#  token), or - authenticate with a token
+#  
+#  Some anonymous compute resources still desire the ability to run code,
+#  completely without authentication. These services can disable all
+#  authentication and security checks, with the full knowledge of what that
+#  implies.
+#c.NotebookApp.disable_check_xsrf = False
+
 ## Whether to enable MathJax for typesetting math/TeX
 #  
 #  MathJax is the javascript library Jupyter uses to render math/LaTeX. It is
@@ -141,7 +155,7 @@
 #c.NotebookApp.iopub_msg_rate_limit = 0
 
 ## The IP address the notebook server will listen on.
-c.NotebookApp.ip = '*'
+#c.NotebookApp.ip = 'localhost'
 
 ## Supply extra arguments that will be passed to Jinja environment.
 #c.NotebookApp.jinja_environment_options = {}
@@ -168,11 +182,13 @@ c.NotebookApp.ip = '*'
 ## The logout handler class to use.
 #c.NotebookApp.logout_handler_class = 'notebook.auth.logout.LogoutHandler'
 
-## The url for MathJax.js.
+## A custom url for MathJax.js. Should be in the form of a case-sensitive url to
+#  MathJax, for example:  /static/components/MathJax/MathJax.js
 #c.NotebookApp.mathjax_url = ''
 
 ## Dict of Python modules to load as notebook server extensions.Entry values can
-#  be used to enable and disable the loading ofthe extensions.
+#  be used to enable and disable the loading ofthe extensions. The extensions
+#  will be loaded in alphabetical order.
 #c.NotebookApp.nbserver_extensions = {}
 
 ## The directory to use for notebooks and kernels.
@@ -182,7 +198,7 @@ c.NotebookApp.ip = '*'
 #  platform dependent and determined by the python standard library `webbrowser`
 #  module, unless it is overridden using the --browser (NotebookApp.browser)
 #  configuration option.
-c.NotebookApp.open_browser = False
+#c.NotebookApp.open_browser = True
 
 ## Hashed password to use for web authentication.
 #  
@@ -191,7 +207,7 @@ c.NotebookApp.open_browser = False
 #    from notebook.auth import passwd; passwd()
 #  
 #  The string should be of the form type:salt:hashed-password.
-c.NotebookApp.password = 'sha1:b3665b097447:fbeab5fd2d24fe39378a885bc0dcf05935b62cca'
+#c.NotebookApp.password = ''
 
 ## The port the notebook server will listen on.
 c.NotebookApp.port = 39901
@@ -217,6 +233,14 @@ c.NotebookApp.port = 39901
 ## Supply SSL options for the tornado HTTPServer. See the tornado docs for
 #  details.
 #c.NotebookApp.ssl_options = {}
+
+## Token used for authenticating first-time connections to the server.
+#  
+#  When no password is enabled, the default is to generate a new, random token.
+#  
+#  Setting to an empty string disables authentication altogether, which is NOT
+#  RECOMMENDED.
+#c.NotebookApp.token = '<generated>'
 
 ## Supply overrides for the tornado.web.Application that the Jupyter notebook
 #  uses.
@@ -292,6 +316,9 @@ c.NotebookApp.port = 39901
 #  kernel does not receive the option --debug if it given on the Jupyter command
 #  line.
 #c.KernelManager.kernel_cmd = []
+
+## Time to wait for a kernel to terminate before killing it, in seconds.
+#c.KernelManager.shutdown_wait_time = 5.0
 
 #------------------------------------------------------------------------------
 # Session(Configurable) configuration
@@ -524,10 +551,6 @@ c.NotebookApp.port = 39901
 ## The hashing algorithm used to sign notebooks.
 #c.NotebookNotary.algorithm = 'sha256'
 
-## The number of notebook signatures to cache. When the number of signatures
-#  exceeds this value, the oldest 25% of signatures will be culled.
-#c.NotebookNotary.cache_size = 65535
-
 ## The sqlite file in which to store notebook signatures. By default, this will
 #  be in your Jupyter data directory. You can set it to ':memory:' to disable
 #  sqlite writing to the filesystem.
@@ -538,6 +561,10 @@ c.NotebookApp.port = 39901
 
 ## The file where the secret key is stored.
 #c.NotebookNotary.secret_file = ''
+
+## A callable returning the storage backend for notebook signatures. The default
+#  uses an SQLite database.
+#c.NotebookNotary.store_factory = traitlets.Undefined
 
 #------------------------------------------------------------------------------
 # KernelSpecManager(LoggingConfigurable) configuration
